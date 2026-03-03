@@ -71,8 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             atualizarProgresso(60, 'Gerando o arquivo PDF...');
 
+            // Pré-carregar o modelo de fundo (Photoshop)
+            let templateBase64 = null;
+            try {
+                // Tenta carregar o template na pasta static.
+                // O usuário deve salvar a imagem lá com o nome modelo_carteirinha.png
+                templateBase64 = await loadImageAsBase64('/static/img/modelo_carteirinha.png');
+            } catch (e) {
+                console.warn('Modelo de fundo não encontrado em /static/img/modelo_carteirinha.png. Usando layout padrão.');
+            }
+
             // 3. Desenhar no PDF
-            gerarDocumentoPDF(alunosComImagens);
+            gerarDocumentoPDF(alunosComImagens, templateBase64);
 
         } catch (e) {
             console.error(e);
@@ -98,7 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-                const dataURL = canvas.toDataURL('image/jpeg');
+                // Extrai a extensão pela URL simplificadamente
+                const formato = url.toLowerCase().includes('.png') ? 'image/png' : 'image/jpeg';
+                const dataURL = canvas.toDataURL(formato);
                 resolve(dataURL);
             };
             img.onerror = function () {
@@ -108,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function gerarDocumentoPDF(alunos) {
+    function gerarDocumentoPDF(alunos, templateBase64) {
         // Inicializa PDF = Retrato (p), milímetros (mm), A4 (a4)
         const doc = new jsPDF('p', 'mm', 'a4');
 
@@ -132,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             x = MARGIN_X + (coluna * (CARD_WIDTH + GAP_X));
             y = MARGIN_Y + (linha * (CARD_HEIGHT + GAP_Y));
 
-            desenharCarteirinha(doc, x, y, aluno);
+            desenharCarteirinha(doc, x, y, aluno, templateBase64);
 
             contadorItemSheet++;
         });
@@ -176,25 +188,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // A função principal onde acontece o DESENHO real da carteirinha
-    function desenharCarteirinha(doc, startX, startY, aluno) {
+    function desenharCarteirinha(doc, startX, startY, aluno, templateBase64) {
 
-        // 1. Fundo da Carteirinha (Retângulo com bordas arredondadas)
-        doc.setDrawColor(200, 200, 200); // Cor da Borda
-        doc.setFillColor(255, 255, 255); // Fundo Branco
-        doc.roundedRect(startX, startY, CARD_WIDTH, CARD_HEIGHT, 3, 3, 'FD'); // Fill and Draw
+        if (templateBase64) {
+            // Desenha a imagem de fundo do Photoshop ocupando todo o cartão
+            // Usando PNG caso o template tenha fundo transparente (ou JPEG dependendo da origem)
+            const tipo = templateBase64.includes('image/png') ? 'PNG' : 'JPEG';
+            doc.addImage(templateBase64, tipo, startX, startY, CARD_WIDTH, CARD_HEIGHT);
 
-        // 2. Cabeçalho Colorido (Retângulo Azul no Topo)
-        // Como o roundedRect puro para só uma parte é chato, desenhamos um retângulo
-        // normal e deixamos um pingo de espaço, ou melhor, usamos as cores diretas.
-        doc.setFillColor(79, 70, 229); // Primary Indigo color
-        // Top border bar
-        doc.rect(startX, startY, CARD_WIDTH, 12, 'F');
+            // Desenha apenas uma borda leve para marca de corte na tesoura/guilhotina
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(startX, startY, CARD_WIDTH, CARD_HEIGHT);
+        } else {
+            // Fallback: Se não achar o arquivo modelo_carteirinha.png, desenha o layout padrão
+            // 1. Fundo da Carteirinha (Retângulo com bordas arredondadas)
+            doc.setDrawColor(200, 200, 200); // Cor da Borda
+            doc.setFillColor(255, 255, 255); // Fundo Branco
+            doc.roundedRect(startX, startY, CARD_WIDTH, CARD_HEIGHT, 3, 3, 'FD'); // Fill and Draw
 
-        // Texto Cabeçalho
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("IDENTIFICAÇÃO ESTUDANTIL", startX + (CARD_WIDTH / 2), startY + 8, { align: 'center' });
+            // 2. Cabeçalho Colorido (Retângulo Azul no Topo)
+            doc.setFillColor(79, 70, 229); // Primary Indigo color
+            doc.rect(startX, startY, CARD_WIDTH, 12, 'F');
+
+            // Texto Cabeçalho
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text("IDENTIFICAÇÃO ESTUDANTIL", startX + (CARD_WIDTH / 2), startY + 8, { align: 'center' });
+        }
 
         // 3. Inserir a Foto do Aluno à Esquerda
         const FOTO_X = startX + 5;
