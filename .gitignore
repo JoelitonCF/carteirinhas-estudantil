@@ -1,0 +1,19 @@
+# Credenciais — NUNCA versionar
+.env
+
+# Fotos dos alunos
+uploads/
+
+# Ambiente virtual Python
+venv/
+
+# Arquivos do sistema operacional
+__pycache__/
+*.pyc
+.DS_Store
+
+# Temporary files
+*.txt
+*.py
+!app.py
+!database.py

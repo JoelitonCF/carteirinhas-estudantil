@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Cadastro | EduCards{% endblock %}
+{% block page_title %}Novo Cadastro de Aluno{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div id="alert-container" class="alert"></div>
+
+    <form id="form-cadastro" enctype="multipart/form-data">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" name="nome" class="form-control" placeholder="Ex: João da Silva" required>
+            </div>
+
+            <div class="form-group">
+                <label for="matricula">Matrícula (RA)</label>
+                <input type="text" id="matricula" name="matricula" class="form-control" placeholder="Ex: 20250001"
+                    required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="turma">Turma</label>
+                <select id="turma" name="turma" class="form-control" required>
+                    <option value="" disabled selected>Selecione a Turma</option>
+                    <option value="1INFO">1º Informática</option>
+                    <option value="2INFO">2º Informática</option>
+                    <option value="3INFO">3º Informática</option>
+                    <option value="1ADM">1º Administração</option>
+                    <option value="2ADM">2º Administração</option>
+                    <option value="3ADM">3º Administração</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="turno">Turno</label>
+                <select id="turno" name="turno" class="form-control" required>
+                    <option value="" disabled selected>Selecione o Turno</option>
+                    <option value="Manha">Manhã</option>
+                    <option value="Tarde">Tarde</option>
+                    <option value="Noite">Noite</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="ano_letivo">Ano Letivo</label>
+            <input type="number" id="ano_letivo" name="ano_letivo" class="form-control" value="2025" min="2020"
+                max="2100" required>
+        </div>
+
+        <div class="form-group">
+            <label>Foto do Aluno (Proporção 1:1 recomendada)</label>
+            <div class="file-upload-wrapper" id="drop-zone">
+                <input type="file" id="foto" name="foto" accept="image/png, image/jpeg" required>
+                <div class="upload-content">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <p class="upload-text">Arraste a imagem ou <span>clique para selecionar</span></p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Máximo: 5MB (JPG, PNG)
+                    </p>
+                </div>
+            </div>
+
+            <div class="file-preview" id="file-preview">
+                <img id="preview-image" src="" alt="Preview">
+                <div>
+                    <strong id="preview-name" style="color: var(--text-primary);">nome-foto.jpg</strong>
+                    <p id="preview-size" style="font-size: 0.8rem; color: var(--text-secondary);">250 KB</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary" id="btn-submit">
+                <i class="fa-solid fa-save"></i> Salvar Cadastro
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/cadastro.js') }}"></script>
+{% endblock %}

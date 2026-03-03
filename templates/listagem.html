@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Alunos e Edição | EduCards{% endblock %}
+{% block page_title %}Gerenciar Alunos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        align-items: flex-end;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .table th,
+    .table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background-color: var(--bg-color);
+    }
+
+    .table tbody tr {
+        transition: var(--transition);
+    }
+
+    .table tbody tr:hover {
+        background-color: var(--bg-color);
+    }
+
+    .table-foto {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--border-color);
+    }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-impresso {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-pendente {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div id="alert-container" class="alert"></div>
+
+    <div class="filter-bar">
+        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+            <label for="filtro-turma">Filtrar por Turma</label>
+            <select id="filtro-turma" class="form-control">
+                <option value="">Todas as Turmas</option>
+                <option value="1INFO">1º Informática</option>
+                <option value="2INFO">2º Informática</option>
+                <option value="3INFO">3º Informática</option>
+                <option value="1ADM">1º Administração</option>
+                <option value="2ADM">2º Administração</option>
+                <option value="3ADM">3º Administração</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+            <label for="filtro-turno">Filtrar por Turno</label>
+            <select id="filtro-turno" class="form-control">
+                <option value="">Todos os Turnos</option>
+                <option value="Manha">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
+            </select>
+        </div>
+        <button id="btn-filtrar" class="btn btn-primary" style="height: 44px;">
+            <i class="fa-solid fa-filter"></i> Filtrar
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Matrícula</th>
+                    <th>Nome Completo</th>
+                    <th>Turma</th>
+                    <th>Turno</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-alunos">
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 30px;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Carregando dados...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/listagem.js') }}"></script>
+{% endblock %}

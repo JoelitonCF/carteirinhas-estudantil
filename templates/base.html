@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Carteirinhas Escolares{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome API para icones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar de Navegação -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <h2>Carteirinhas</h2>
+                </div>
+                <p class="subtitle">Emissão de Carteiras</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="{% if request.path == '/cadastro' or request.path == '/' %}active{% endif %}">
+                        <a href="{{ url_for('page_cadastro') }}">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Novo Cadastro</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.path == '/listagem' %}active{% endif %}">
+                        <a href="{{ url_for('page_listagem') }}">
+                            <i class="fa-solid fa-users-viewfinder"></i>
+                            <span>Alunos & Edição</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.path == '/gerador' %}active{% endif %}">
+                        <a href="{{ url_for('page_gerador') }}">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Gerar PDF (Lote)</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Desenvolvidor pelos Alunos do 3º ano(2026) Curso Técnico em Desenvolvimento de Sistemas - E.E.E.F.M.
+                    Drª Ester Mouta</p>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="topbar">
+                <button id="mobile-menu-btn" class="mobile-menu-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="topbar-title">
+                    <h1>{% block page_title %}Página Inicial{% endblock %}</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button id="theme-toggle" class="icon-btn theme-toggle">
+                        <i class="fa-solid fa-sun light-icon"></i>
+                        <i class="fa-solid fa-moon dark-icon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts Base -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

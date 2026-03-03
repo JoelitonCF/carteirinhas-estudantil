@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Gerador de Carteirinhas | EduCards{% endblock %}
+{% block page_title %}Gerador de PDF em Lote{% endblock %}
+
+{% block extra_css %}
+<style>
+    .generator-panel {
+        display: flex;
+        gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+        .generator-panel {
+            flex-direction: column;
+        }
+    }
+
+    .settings-col {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .preview-col {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: var(--sidebar-bg);
+        border: 1px dashed var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 30px;
+        min-height: 400px;
+    }
+
+    .pdf-placeholder {
+        text-align: center;
+        color: var(--text-secondary);
+        margin: auto;
+    }
+
+    .pdf-placeholder i {
+        font-size: 4rem;
+        margin-bottom: 15px;
+        color: var(--border-color);
+    }
+
+    /* O Iframe para o PDF gerado será injetado aqui */
+    #pdf-preview-frame {
+        width: 100%;
+        height: 600px;
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        background-color: white;
+        /* PDF viewer needs white bg */
+    }
+
+    #progress-container {
+        display: none;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .progress-bar-bg {
+        width: 100%;
+        height: 10px;
+        background-color: var(--border-color);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background-color: var(--primary);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="generator-panel">
+    <!-- Configurações do Gerador -->
+    <div class="card settings-col">
+        <h3><i class="fa-solid fa-sliders"></i> Opções de Geração</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 10px 0 25px 0;">
+            Selecione uma turma para gerar as carteirinhas em lote (8 por folha A4).
+        </p>
+
+        <div id="alert-container" class="alert"></div>
+
+        <div class="form-group">
+            <label for="turma-select">Selecione a Turma</label>
+            <select id="turma-select" class="form-control">
+                <option value="" disabled selected>Escolha a turma...</option>
+                <option value="1INFO">1º Informática</option>
+                <option value="2INFO">2º Informática</option>
+                <option value="3INFO">3º Informática</option>
+                <option value="1ADM">1º Administração</option>
+                <option value="2ADM">2º Administração</option>
+                <option value="3ADM">3º Administração</option>
+                <option value="ALL">Todas as Turmas (Demorado)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="apenas-pendentes" checked style="margin-right: 8px;">
+                Gerar apenas alunos com status "Pendente"
+            </label>
+        </div>
+
+        <button id="btn-gerar" class="btn btn-primary btn-block" style="margin-top: 20px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Preview do PDF
+        </button>
+
+        <div id="progress-container">
+            <p style="font-size: 0.85rem; margin-bottom: 5px; color: var(--text-secondary);" id="progress-text">
+                Processando imagens...</p>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview do PDF -->
+    <div class="preview-col" id="preview-container">
+        <div class="pdf-placeholder" id="pdf-placeholder">
+            <i class="fa-regular fa-file-pdf"></i>
+            <h3>O PDF aparecerá aqui</h3>
+            <p>Selecione uma turma e clique em "Gerar" para visualizar.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Importando o jsPDF (UMD version) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- A lógica do nosso gerador -->
+<script src="{{ url_for('static', filename='js/gerador.js') }}"></script>
+{% endblock %}
