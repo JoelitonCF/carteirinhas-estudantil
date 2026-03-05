@@ -13,14 +13,14 @@ CREATE TABLE IF NOT EXISTS alunos (
   turma      VARCHAR(10)  NOT NULL,
   turno      VARCHAR(10)  NOT NULL,
   foto       VARCHAR(200),
-  ano_letivo YEAR         NOT NULL DEFAULT 2025,
+  ano_letivo YEAR         NOT NULL DEFAULT 2026,
   impresso   TINYINT(1)   NOT NULL DEFAULT 0,
   created_at DATETIME     NOT NULL DEFAULT NOW()
 );
 
 -- Criar usuário da aplicação
 CREATE USER 'carteirinhas_user'@'localhost'
-  IDENTIFIED BY 'SenhaForte@2025';
+  IDENTIFIED BY 'root';
 
 GRANT ALL PRIVILEGES ON carteirinhas.*
   TO 'carteirinhas_user'@'localhost';

@@ -219,17 +219,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. Inserir a Foto do Aluno à Esquerda
         const FOTO_X = startX + 5;
-        const FOTO_Y = startY + 16;
-        const FOTO_SIZE = 30; // 30x30mm quadrada
+        const FOTO_Y = startY + 19;
+        const FOTO_WIDTH = 18;  // 30mm de largura
+        const FOTO_HEIGHT = 24; // 40mm de altura
 
         // Draw Foto Placeholder/Border
         doc.setDrawColor(220, 220, 220);
-        doc.rect(FOTO_X, FOTO_Y, FOTO_SIZE, FOTO_SIZE);
+        doc.rect(FOTO_X, FOTO_Y, FOTO_WIDTH, FOTO_HEIGHT);
 
         if (aluno.imagemBase64) {
             // Adiciona a Imagem Real 
             // Parâmetros: Base64, Tipo, X, Y, Width, Height
-            doc.addImage(aluno.imagemBase64, 'JPEG', FOTO_X, FOTO_Y, FOTO_SIZE, FOTO_SIZE);
+            doc.addImage(aluno.imagemBase64, 'JPEG', FOTO_X, FOTO_Y, FOTO_WIDTH, FOTO_HEIGHT);
         } else {
             // Fallback Text se não tem Imagem
             doc.setTextColor(150, 150, 150);
@@ -238,22 +239,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 4. Inserir Textos Informativos à Direita da Foto
-        const TEXT_X = FOTO_X + FOTO_SIZE + 5;
+        const TEXT_X = FOTO_X + FOTO_WIDTH + 5;
         let currentY = FOTO_Y + 5;
 
         // Nome
         doc.setTextColor(30, 30, 30);
-        doc.setFontSize(11);
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
         // Usar splitTextToSize em caso de nomes enormes
-        const splitNome = doc.splitTextToSize(aluno.nome.toUpperCase(), CARD_WIDTH - FOTO_SIZE - 12);
+        const splitNome = doc.splitTextToSize(aluno.nome.toUpperCase(), CARD_WIDTH - FOTO_WIDTH - 12);
         doc.text(splitNome, TEXT_X, currentY);
 
         // Se o nome pulou a linha, ajuste o height
         currentY += (splitNome.length * 5);
 
         // Rótulos e Informações
-        doc.setFontSize(8);
+        doc.setFontSize(7);
 
         // RA
         doc.setFont('helvetica', 'normal');
@@ -284,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 5. Rodapé da Carteirinha
         doc.setFontSize(7);
         doc.setFont('helvetica', 'italic');
-        doc.setTextColor(150, 150, 150);
+        doc.setTextColor(255, 255, 255);
         doc.text(`Válida até Dezembro de ${aluno.ano_letivo}`, startX + (CARD_WIDTH / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
     }
 

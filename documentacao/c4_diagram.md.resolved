@@ -1,0 +1,48 @@
+# Diagrama C4 - Sistema de Carteirinhas Estudantis
+
+Aqui está o diagrama C4 (Níveis de Contexto e Container) para o seu projeto de Carteira Estudantil, utilizando a sintaxe Mermaid suportada nativamente no GitHub/Markdown.
+
+## Nível 1: Diagrama de Contexto
+Este diagrama mostra o sistema como uma caixa preta, focando nos usuários que o utilizam e nos sistemas externos com os quais interage.
+
+```mermaid
+C4Context
+    title Diagrama de Contexto para o Sistema de Carteirinhas Estudantis
+
+    Person(admin, "Administrador/Funcionário", "Funcionário da escola responsável por gerenciar os alunos e imprimir as carteirinhas.")
+    
+    System(sistema_carteirinhas, "Sistema de Carteiras Estudantis", "Permite cadastrar alunos, listar registros e gerar carteirinhas para impressão (frente e verso com foto).")
+
+    Rel(admin, sistema_carteirinhas, "Acessa, gerencia alunos e imprime carteirinhas", "Navegador Web")
+```
+
+## Nível 2: Diagrama de Container
+Este diagrama abre a caixa preta e mostra os principais contêineres que compõem o sistema de carteirinhas.
+
+```mermaid
+C4Container
+    title Diagrama de Container para o Sistema de Carteirinhas Estudantis
+
+    Person(admin, "Administrador/Funcionário", "Funcionário da escola.")
+
+    System_Boundary(c1, "Sistema de Carteiras Estudantis") {
+        Container(webapp, "Aplicação Web / API", "Python, Flask", "Fornece a API REST (JSON) e renderiza arquivos HTML. Lida com uploads de fotos e regras de negócio.")
+        
+        Container(frontend, "Frontend / Single-Page Application", "HTML, CSS, JavaScript Vanilla", "Proporciona a interface visual via navegador (Páginas de Cadastro, Listagem, Gerador de Impressão).")
+        
+        ContainerDb(database, "Banco de Dados", "MySQL", "Armazena informações dos alunos (nome, matrícula, turma, turno, caminho da foto, status impresso).")
+        
+        Container(filesystem, "File System (Uploads)", "Sistema de Arquivos Local", "Armazena as fotos enviadas (JPG, PNG) renomeadas de acordo com a matrícula do aluno.")
+    }
+
+    Rel(admin, frontend, "Navega e interage com o sistema (HTTPS/HTTP)", "Navegador Web")
+    Rel(frontend, webapp, "Faz chamadas na API (JSON) e envia formulários (Multipart)", "AJAX/Fetch API")
+    Rel(webapp, database, "Lê e grava dados dos alunos", "MySQL Connector")
+    Rel(webapp, filesystem, "Salva e recupera as fotos dos alunos", "OS Path")
+```
+
+## Resumo dos Componentes do Contêiner
+- **Frontend (Static/Templates):** Engloba os arquivos JS (`cadastro.js`, etc.), CSS e templates HTML do Flask (Jinja2). As interações (CRUD) com o servidor são feitas via Fetch API.
+- **Aplicação Web (Flask):** O arquivo [app.py](file:///c:/Users/joeli/OneDrive/%C3%81rea%20de%20Trabalho/Drive/Codigos/carteira-estudantil/app.py) expõe rotas para renderizar as views web e para ações de backend como `GET/POST/PUT/DELETE /api/alunos`. O arquivo [database.py](file:///c:/Users/joeli/OneDrive/%C3%81rea%20de%20Trabalho/Drive/Codigos/carteira-estudantil/database.py) isola a comunicação de banco de dados do controle de rota.
+- **Banco de Dados (MySQL):** Controla o esquema simples definido em [banco.sql](file:///c:/Users/joeli/OneDrive/%C3%81rea%20de%20Trabalho/Drive/Codigos/carteira-estudantil/banco.sql) (tabela [alunos](file:///c:/Users/joeli/OneDrive/%C3%81rea%20de%20Trabalho/Drive/Codigos/carteira-estudantil/app.py#45-54) e permissões).
+- **Sistema de Arquivos:** Pasta local do backend (geralmente `/uploads`) configurada no Flask para receber imagens e servir sob demanda.

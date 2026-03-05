@@ -20,9 +20,9 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# ==========================================
+
 # ROTAS DE PÁGINAS (FRONTEND)
-# ==========================================
+
 
 @app.route('/')
 def index():
@@ -40,9 +40,7 @@ def page_listagem():
 def page_gerador():
     return render_template('gerador.html')
 
-# ==========================================
-# ROTAS DA API (BACKEND)
-# ==========================================
+#ROTAS API / BACKEND
 
 @app.route('/api/alunos', methods=['GET'])
 def get_alunos():
