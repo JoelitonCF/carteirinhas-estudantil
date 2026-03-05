@@ -15,9 +15,28 @@
             </div>
 
             <div class="form-group">
-                <label for="matricula">Matrícula (RA)</label>
-                <input type="text" id="matricula" name="matricula" class="form-control" placeholder="Ex: 20250001"
+                <label for="codigo_inep">Código INEP</label>
+                <input type="text" id="codigo_inep" name="codigo_inep" class="form-control"
+                    placeholder="Ex: 2026000101001" required>
+            </div>
+        </div>
+        <!--Nova linha para Máe e Nascimento-->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nome_mae">Nome da Mãe</label>
+                <input type="text" name="nome_mae" id="nome_mae" class="form-control" placeholder="Ex: Maria Joaquina"
                     required>
+            </div>
+            <div class="form-group">
+                <label for="data_nascimento">Data de Nascimento</label>
+                <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" required>
+            </div>
+        </div>
+        <!--Nova linha para o Curso-->
+        <div class="form-row">
+            <div class="form-group" style="width: 100%;">
+                <label for="curso">Curso</label>
+                <input type="text" name="curso" id="curso" class="form-control" value="ENSINO MÉDIO" required>
             </div>
         </div>
 

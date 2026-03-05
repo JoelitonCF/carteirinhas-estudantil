@@ -5,20 +5,22 @@ CREATE DATABASE IF NOT EXISTS carteirinhas
 
 USE carteirinhas;
 
--- Criar a tabela de alunos
+-- CRIAÇÃO DA TABELA ALUNOS
 CREATE TABLE IF NOT EXISTS alunos (
-  id         INT          AUTO_INCREMENT PRIMARY KEY,
-  nome       VARCHAR(150) NOT NULL,
-  matricula  VARCHAR(20)  NOT NULL UNIQUE,
-  turma      VARCHAR(10)  NOT NULL,
-  turno      VARCHAR(10)  NOT NULL,
-  foto       VARCHAR(200),
-  ano_letivo YEAR         NOT NULL DEFAULT 2026,
-  impresso   TINYINT(1)   NOT NULL DEFAULT 0,
-  created_at DATETIME     NOT NULL DEFAULT NOW()
+id INT AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR(150) NOT NULL,
+codigo_inep VARCHAR(20) NOT NULL UNIQUE, 
+nome_mae VARCHAR(150) DEFAULT NULL, 
+curso VARCHAR(100) DEFAULT 'ENSINO MEDIO', 
+turma VARCHAR(10) NOT NULL, 
+turno VARCHAR(10) NOT NULL,
+foto VARCHAR(100), 
+ano_letivo YEAR NOT NULL DEFAULT '2026',
+impresso TINYINT(1) NOT NULL DEFAULT 0, 
+create_at DATETIME NOT NULL DEFAULT NOW()
 );
 
--- Criar usuário da aplicação
+
 CREATE USER 'carteirinhas_user'@'localhost'
   IDENTIFIED BY 'root';
 

@@ -116,8 +116,9 @@
             <thead>
                 <tr>
                     <th>Foto</th>
-                    <th>Matrícula</th>
+                    <th>Código INEP</th>
                     <th>Nome Completo</th>
+
                     <th>Turma</th>
                     <th>Turno</th>
                     <th>Status</th>
@@ -134,6 +135,85 @@
         </table>
     </div>
 </div>
+
+
+<!-- Modal de Edição -->
+<div id="modal-edicao" class="modal-overlay">
+    <div class="card modal-card">
+        <h3
+            style="margin-bottom: 20px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            Editar Aluno</h3>
+
+        <form id="form-edicao" enctype="multipart/form-data">
+            <input type="hidden" id="edit-id" name="id">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-nome">Nome Completo</label>
+                    <input type="text" id="edit-nome" name="nome" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-codigo_inep">Código INEP</label>
+                    <input type="text" id="edit-codigo_inep" name="codigo_inep" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-nome_mae">Nome da Mãe</label>
+                    <input type="text" id="edit-nome_mae" name="nome_mae" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-data_nascimento">Data de Nasc.</label>
+                    <input type="date" id="edit-data_nascimento" name="data_nascimento" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="width: 100%;">
+                    <label for="edit-curso">Curso</label>
+                    <input type="text" id="edit-curso" name="curso" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-turma">Turma</label>
+                    <select id="edit-turma" name="turma" class="form-control" required>
+                        <option value="1INFO">1º Informática</option>
+                        <option value="2INFO">2º Informática</option>
+                        <option value="3INFO">3º Informática</option>
+                        <option value="1ADM">1º Administração</option>
+                        <option value="2ADM">2º Administração</option>
+                        <option value="3ADM">3º Administração</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-turno">Turno</label>
+                    <select id="edit-turno" name="turno" class="form-control" required>
+                        <option value="Manha">Manhã</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Noite">Noite</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nova Foto (Deixe em branco para manter a atual)</label>
+                <input type="file" id="edit-foto" name="foto" accept="image/png, image/jpeg" class="form-control">
+            </div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn btn-outline" onclick="fecharModalEdicao()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btn-submit-edicao">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}

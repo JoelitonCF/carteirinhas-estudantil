@@ -256,14 +256,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Rótulos e Informações
         doc.setFontSize(7);
 
-        // RA
+        // Código INEP
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text("Matrícula (RA)", TEXT_X, currentY);
+        doc.text("Código INEP", TEXT_X, currentY);
         currentY += 4;
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(0, 0, 0);
-        doc.text(aluno.matricula, TEXT_X, currentY);
+        doc.text(aluno.codigo_inep, TEXT_X, currentY);
         currentY += 6;
 
         // Turma & Turno lado a lado

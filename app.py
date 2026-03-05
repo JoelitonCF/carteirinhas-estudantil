@@ -77,17 +77,20 @@ def criar_aluno():
 
     # Lendo os os outros campos do form
     nome = request.form.get('nome')
-    matricula = request.form.get('matricula')
+    codigo_inep = request.form.get('codigo_inep')
+    nome_mae = request.form.get('nome_mae')
+    data_nascimento = request.form.get('data_nascimento')
+    curso = request.form.get('curso')
     turma = request.form.get('turma')
     turno = request.form.get('turno')
-    ano_letivo = request.form.get('ano_letivo', '2025')
+    ano_letivo = request.form.get('ano_letivo', '2026')
     
-    if not all([nome, matricula, turma, turno]):
+    if not all([nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno]):
         return jsonify({"erro": "Todos os campos de texto são obrigatórios."}), 400
 
-    # Salva o arquivo com o nome da matrícula para evitar nomes duplicados
+    # Salva o arquivo com o codigo INEP para evitar nomes duplicados
     extensao = foto_file.filename.rsplit('.', 1)[1].lower()
-    nome_arquivo = secure_filename(f"{matricula}.{extensao}")
+    nome_arquivo = secure_filename(f"{codigo_inep}.{extensao}")
     caminho_salvar = os.path.join(app.config['UPLOAD_FOLDER'], nome_arquivo)
     
     try:
@@ -96,7 +99,10 @@ def criar_aluno():
         # Salva no banco apontando para o arquivo no BD
         novo_id = database.inserir_aluno(
             nome=nome,
-            matricula=matricula,
+            codigo_inep=codigo_inep,
+            nome_mae=nome_mae,
+            data_nascimento=data_nascimento,
+            curso=curso,
             turma=turma,
             turno=turno,
             foto=nome_arquivo,
@@ -116,11 +122,14 @@ def atualizar_aluno(aluno_id):
         return jsonify({"erro": "Aluno não encontrado"}), 404
         
     nome = request.form.get('nome')
-    matricula = request.form.get('matricula')
+    codigo_inep = request.form.get('codigo_inep')
+    nome_mae = request.form.get('nome_mae')
+    data_nascimento = request.form.get('data_nascimento')
+    curso = request.form.get('curso', 'ENSINO MEDIO')
     turma = request.form.get('turma')
     turno = request.form.get('turno')
     
-    if not all([nome, matricula, turma, turno]):
+    if not all([nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno]):
         return jsonify({"erro": "Todos os campos de texto são obrigatórios."}), 400
 
     nome_arquivo = None
@@ -130,12 +139,12 @@ def atualizar_aluno(aluno_id):
         foto_file = request.files['foto']
         if foto_file.filename != '' and allowed_file(foto_file.filename):
             extensao = foto_file.filename.rsplit('.', 1)[1].lower()
-            nome_arquivo = secure_filename(f"{matricula}.{extensao}")
+            nome_arquivo = secure_filename(f"{codigo_inep}.{extensao}")
             caminho_salvar = os.path.join(app.config['UPLOAD_FOLDER'], nome_arquivo)
             foto_file.save(caminho_salvar)
 
     try:
-        atualizado = database.atualizar_aluno(aluno_id, nome, matricula, turma, turno, nome_arquivo)
+        atualizado = database.atualizar_aluno(aluno_id, nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, nome_arquivo)
         return jsonify({"sucesso": True, "mensagem": "Aluno atualizado com sucesso!"}), 200
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
