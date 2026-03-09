@@ -12,11 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressText = document.getElementById('progress-text');
 
     // Constantes do Layout (A4 = 210 x 297 mm)
-    const CARD_WIDTH = 85;
+    // Layout dobrável: 170mm (L) x 55mm (A)
+    const CARD_WIDTH = 170;
     const CARD_HEIGHT = 55;
-    const MARGIN_X = 15; // Margem da esquerda
+    const MARGIN_X = 20; // Margem da esquerda (Centralizando: 210 - 170 = 40 / 2 = 20)
     const MARGIN_Y = 15; // Margem do topo
-    const GAP_X = 10;    // Espaço horizontal entre as colunas
+    const GAP_X = 0;    // Espaço horizontal nulo pois terá só 1 coluna
     const GAP_Y = 10;    // Espaço vertical entre as linhas
 
     btnGerar.addEventListener('click', async () => {
@@ -126,20 +127,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let x = MARGIN_X;
         let y = MARGIN_Y;
-        let contadorItemSheet = 0; // Quantos itens já foram desenhados na página atual (0 até 8)
+        let contadorItemSheet = 0; // Quantos itens já foram desenhados na página atual (0 até 4)
 
         alunos.forEach((aluno, index) => {
-            // Se já temos 8 (ou o grid máximo definido) na página, criar nova página
-            if (contadorItemSheet > 0 && contadorItemSheet % 8 === 0) {
+            // Cabem 4 carteirinhas por página (4 * 65 = 260mm + margem = 275mm)
+            if (contadorItemSheet > 0 && contadorItemSheet % 4 === 0) {
                 doc.addPage();
                 x = MARGIN_X;
                 y = MARGIN_Y;
                 contadorItemSheet = 0;
             }
 
-            // Calculo da Posição (coluna e linha baseado no contador)
-            const coluna = contadorItemSheet % 2; // 0 (esquerda) ou 1 (direita)
-            const linha = Math.floor(contadorItemSheet / 2); // 0, 1, 2 ou 3
+            // Apenas 1 coluna agora
+            const coluna = 0;
+            const linha = contadorItemSheet % 4; // 0, 1, 2 ou 3
 
             x = MARGIN_X + (coluna * (CARD_WIDTH + GAP_X));
             y = MARGIN_Y + (linha * (CARD_HEIGHT + GAP_Y));
@@ -187,106 +188,174 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function formatarData(dataString) {
+        if (!dataString) return "";
+        // Se a data vier no formato ISO/GMT do banco
+        const dataObj = new Date(dataString);
+        if (!isNaN(dataObj.getTime())) {
+            return dataObj.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        }
+        return dataString;
+    }
+
     // A função principal onde acontece o DESENHO real da carteirinha
     function desenharCarteirinha(doc, startX, startY, aluno, templateBase64) {
 
         if (templateBase64) {
-            // Desenha a imagem de fundo do Photoshop ocupando todo o cartão
-            // Usando PNG caso o template tenha fundo transparente (ou JPEG dependendo da origem)
+            // Desenha a imagem de fundo ocupando 170x55
             const tipo = templateBase64.includes('image/png') ? 'PNG' : 'JPEG';
             doc.addImage(templateBase64, tipo, startX, startY, CARD_WIDTH, CARD_HEIGHT);
 
-            // Desenha apenas uma borda leve para marca de corte na tesoura/guilhotina
             doc.setDrawColor(200, 200, 200);
             doc.rect(startX, startY, CARD_WIDTH, CARD_HEIGHT);
         } else {
-            // Fallback: Se não achar o arquivo modelo_carteirinha.png, desenha o layout padrão
-            // 1. Fundo da Carteirinha (Retângulo com bordas arredondadas)
-            doc.setDrawColor(200, 200, 200); // Cor da Borda
-            doc.setFillColor(255, 255, 255); // Fundo Branco
-            doc.roundedRect(startX, startY, CARD_WIDTH, CARD_HEIGHT, 3, 3, 'FD'); // Fill and Draw
+            // Fallback: Layout padrão
+            doc.setDrawColor(200, 200, 200);
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(startX, startY, CARD_WIDTH, CARD_HEIGHT, 3, 3, 'FD');
 
-            // 2. Cabeçalho Colorido (Retângulo Azul no Topo)
-            doc.setFillColor(79, 70, 229); // Primary Indigo color
-            doc.rect(startX, startY, CARD_WIDTH, 12, 'F');
+            // Linha divisória da dobra (meio = 85mm)
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineDashPattern([1, 1], 0); // linha pontilhada
+            doc.line(startX + 85, startY, startX + 85, startY + CARD_HEIGHT);
+            doc.setLineDashPattern([], 0); // reseta padrao solid
 
-            // Texto Cabeçalho
+            // Cabeçalho Colorido (Retângulo Azul no Topo)
+            doc.setFillColor(79, 70, 229);
+            doc.rect(startX, startY, 85, 12, 'F'); // Frente
+            doc.rect(startX + 85, startY, 85, 12, 'F'); // Verso
+
+            // Texto Cabeçalho Frente
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
-            doc.text("IDENTIFICAÇÃO ESTUDANTIL", startX + (CARD_WIDTH / 2), startY + 8, { align: 'center' });
+            doc.text("IDENTIFICAÇÃO ESTUDANTIL", startX + (85 / 2), startY + 8, { align: 'center' });
+
+            // Texto Cabeçalho Verso
+            doc.text("INFORMAÇÕES ADICIONAIS", startX + 85 + (85 / 2), startY + 8, { align: 'center' });
         }
 
-        // 3. Inserir a Foto do Aluno à Esquerda
-        const FOTO_X = startX + 5;
-        const FOTO_Y = startY + 19;
-        const FOTO_WIDTH = 18;  // 30mm de largura
-        const FOTO_HEIGHT = 24; // 40mm de altura
+        /* ---------------------------------------------------------
+         * FRENTE DA CARTEIRINHA (Esquerda: Área 0 a 85 relative X)
+         * --------------------------------------------------------- */
+        const FRENTE_X = startX;
 
-        // Draw Foto Placeholder/Border
+        // Foto do Aluno à Esquerda
+        const FOTO_X = FRENTE_X + 5;
+        const FOTO_Y = startY + 16;
+        const FOTO_WIDTH = 19;  // Largura foto
+        const FOTO_HEIGHT = 25; // Altura foto
+
         doc.setDrawColor(220, 220, 220);
         doc.rect(FOTO_X, FOTO_Y, FOTO_WIDTH, FOTO_HEIGHT);
 
         if (aluno.imagemBase64) {
-            // Adiciona a Imagem Real 
-            // Parâmetros: Base64, Tipo, X, Y, Width, Height
             doc.addImage(aluno.imagemBase64, 'JPEG', FOTO_X, FOTO_Y, FOTO_WIDTH, FOTO_HEIGHT);
         } else {
-            // Fallback Text se não tem Imagem
             doc.setTextColor(150, 150, 150);
             doc.setFontSize(8);
-            doc.text("[Sem Foto]", FOTO_X + 5, FOTO_Y + 15);
+            doc.text("[Sem Foto]", FOTO_X + 2, FOTO_Y + 15);
         }
 
-        // 4. Inserir Textos Informativos à Direita da Foto
+        // Textos da Frente
         const TEXT_X = FOTO_X + FOTO_WIDTH + 5;
-        let currentY = FOTO_Y + 5;
+        let currentY = FOTO_Y + 4;
 
         // Nome
         doc.setTextColor(30, 30, 30);
-        doc.setFontSize(8);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
-        // Usar splitTextToSize em caso de nomes enormes
-        const splitNome = doc.splitTextToSize(aluno.nome.toUpperCase(), CARD_WIDTH - FOTO_WIDTH - 12);
+        const splitNome = doc.splitTextToSize((aluno.nome || '').toUpperCase(), 85 - FOTO_WIDTH - 12);
         doc.text(splitNome, TEXT_X, currentY);
 
-        // Se o nome pulou a linha, ajuste o height
-        currentY += (splitNome.length * 5);
+        currentY += (splitNome.length * 4) + 1;
 
-        // Rótulos e Informações
         doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+
+        // Curso
+        doc.text("Curso", TEXT_X, currentY);
+        currentY += 3;
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text((aluno.curso || 'ENSINO MÉDIO').toUpperCase(), TEXT_X, currentY);
+        currentY += 5;
+
+        // Turma e Turno
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text("Turma:", TEXT_X, currentY);
+        doc.text("Turno:", TEXT_X + 20, currentY);
+        currentY += 3;
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text(aluno.turma || '', TEXT_X, currentY);
+        doc.text(aluno.turno || '', TEXT_X + 20, currentY);
+        currentY += 5;
 
         // Código INEP
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
         doc.text("Código INEP", TEXT_X, currentY);
-        currentY += 4;
+        currentY += 3;
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(0, 0, 0);
-        doc.text(aluno.codigo_inep, TEXT_X, currentY);
-        currentY += 6;
+        doc.text(aluno.codigo_inep || '', TEXT_X, currentY);
 
-        // Turma & Turno lado a lado
-        // Turma
+        /* ---------------------------------------------------------
+         * VERSO DA CARTEIRINHA (Direita: Área 85 a 170 relative X)
+         * --------------------------------------------------------- */
+        const VERSO_X = startX + 85 + 5;
+        let versoY = startY + 18;
+
+        // Mãe
+        doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text("Turma", TEXT_X, currentY);
-
-        // Turno
-        doc.text("Turno", TEXT_X + 20, currentY);
-        currentY += 4;
+        doc.text("Nome da Mãe", VERSO_X, versoY);
+        versoY += 4;
 
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(0, 0, 0);
-        doc.text(aluno.turma, TEXT_X, currentY);
-        doc.text(aluno.turno, TEXT_X + 20, currentY);
-        currentY += 6;
+        doc.setFontSize(8);
+        const splitMae = doc.splitTextToSize((aluno.nome_mae || 'NÃO INFORMADO').toUpperCase(), 75);
+        doc.text(splitMae, VERSO_X, versoY);
+        versoY += (splitMae.length * 4) + 2;
 
-        // 5. Rodapé da Carteirinha
+        // Data de Nascimento
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text("Data de Nascimento", VERSO_X, versoY);
+        versoY += 4;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(8);
+        const dtNascimento = formatarData(aluno.data_nascimento);
+        doc.text(dtNascimento || '--/--/----', VERSO_X, versoY);
+        versoY += 10;
+
+        // Assinatura do Diretor
+        doc.setDrawColor(150, 150, 150);
+        doc.setLineDashPattern([], 0);
+        doc.line(VERSO_X + 10, versoY, VERSO_X + 65, versoY); // Linha
+        versoY += 4;
+
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(50, 50, 50);
+        doc.text("Assinatura do(a) Diretor(a)", VERSO_X + 37.5, versoY, { align: 'center' });
+
+        // Rodapé (nas duas metades)
         doc.setFontSize(7);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(255, 255, 255);
-        doc.text(`Válida até Dezembro de ${aluno.ano_letivo}`, startX + (CARD_WIDTH / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
+        // Rodapé Frente
+        doc.text(`Válida até Dez. de ${aluno.ano_letivo || '2026'}`, FRENTE_X + (85 / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
+        // Rodapé Verso
+        doc.text(`Uso Pessoal e Intransferível`, VERSO_X - 5 + (85 / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
     }
 
     // Marca os lote dos alunos como impressos após a geração do PDF

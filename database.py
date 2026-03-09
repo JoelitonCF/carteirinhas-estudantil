@@ -9,8 +9,8 @@ def get_connection():
         host     = os.getenv('DB_HOST', 'localhost'),
         port     = int(os.getenv('DB_PORT', 3306)),
         database = os.getenv('DB_NAME', 'carteirinhas'),
-        user     = os.getenv('DB_USER', 'carteirinhas_user'),
-        password = os.getenv('DB_PASSWORD', 'SenhaForte@2025'),
+        user     = os.getenv('DB_USER', 'root'),
+        password = os.getenv('DB_PASSWORD', 'root'),
         charset  = 'utf8mb4'
     )
 

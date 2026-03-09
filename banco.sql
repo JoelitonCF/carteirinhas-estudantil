@@ -21,10 +21,3 @@ create_at DATETIME NOT NULL DEFAULT NOW()
 );
 
 
-CREATE USER 'carteirinhas_user'@'localhost'
-  IDENTIFIED BY 'root';
-
-GRANT ALL PRIVILEGES ON carteirinhas.*
-  TO 'carteirinhas_user'@'localhost';
-
-FLUSH PRIVILEGES;
