@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Alunos e Edição | EduCards{% endblock %}
+{% block title %}Alunos e Edição{% endblock %}
 {% block page_title %}Gerenciar Alunos{% endblock %}
 
 {% block extra_css %}
@@ -89,12 +89,6 @@
             <label for="filtro-turma">Filtrar por Turma</label>
             <select id="filtro-turma" class="form-control">
                 <option value="">Todas as Turmas</option>
-                <option value="1INFO">1º Informática</option>
-                <option value="2INFO">2º Informática</option>
-                <option value="3INFO">3º Informática</option>
-                <option value="1ADM">1º Administração</option>
-                <option value="2ADM">2º Administração</option>
-                <option value="3ADM">3º Administração</option>
             </select>
         </div>
         <div class="form-group" style="margin-bottom: 0; flex: 1;">
@@ -182,12 +176,7 @@
                 <div class="form-group">
                     <label for="edit-turma">Turma</label>
                     <select id="edit-turma" name="turma" class="form-control" required>
-                        <option value="1INFO">1º Informática</option>
-                        <option value="2INFO">2º Informática</option>
-                        <option value="3INFO">3º Informática</option>
-                        <option value="1ADM">1º Administração</option>
-                        <option value="2ADM">2º Administração</option>
-                        <option value="3ADM">3º Administração</option>
+                        <option value="" disabled selected>Selecione a Turma</option>
                     </select>
                 </div>
 

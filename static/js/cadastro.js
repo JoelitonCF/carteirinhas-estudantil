@@ -1,4 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Carregar Turmas do Banco de Dados
+    async function carregarTurmas() {
+        try {
+            const res = await fetch('/api/turmas');
+            if (res.ok) {
+                const turmas = await res.json();
+                const selectTurma = document.getElementById('turma');
+                if (selectTurma) {
+                    turmas.forEach(t => {
+                        const opt = document.createElement('option');
+                        // Tenta usar sigla, ou id, ou nome como valor pro banco
+                        opt.value = t.sigla || t.id || t.nome;
+                        opt.textContent = t.nome || t.sigla || t.id;
+                        selectTurma.appendChild(opt);
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('Erro ao carregar turmas', e);
+        }
+    }
+    carregarTurmas();
+
     const formatBytes = (bytes, decimals = 2) => {
         if (!+bytes) return '0 Bytes'
         const k = 1024

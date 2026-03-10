@@ -42,6 +42,14 @@ def page_gerador():
 
 #ROTAS API / BACKEND
 
+@app.route('/api/turmas', methods=['GET'])
+def get_turmas():
+    try:
+        turmas = database.listar_turmas()
+        return jsonify(turmas)
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
 @app.route('/api/alunos', methods=['GET'])
 def get_alunos():
     turma = request.args.get('turma')
@@ -184,6 +192,27 @@ def marcar_impresso(aluno_id):
         if atualizado:
             return jsonify({"sucesso": True}), 200
         return jsonify({"erro": "Aluno não encontrado ou sem alteração."}), 404
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
+@app.route('/api/turmas', methods=['POST'])
+def criar_turma():
+    dados = request.get_json(silent=True) or {}
+    
+    if not dados and request.form:
+        dados = request.form.to_dict()
+        
+    nome = dados.get('nome')
+    sigla = dados.get('sigla')
+    
+    if not nome or not sigla:
+        return jsonify({"erro": "Nome e Sigla da turma são obrigatórios."}), 400
+        
+    try:
+        novo_id = database.inserir_turma(nome, sigla)
+        return jsonify({"sucesso": True, "id": novo_id, "mensagem": "Turma criada com sucesso!"}), 201
+    except mysql.connector.errors.IntegrityError:
+        return jsonify({"erro": f"Turma com a sigla '{sigla}' já existe."}), 400
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 

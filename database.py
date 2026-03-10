@@ -35,6 +35,15 @@ def listar_alunos(turma=None, turno=None):
     conn.close()
     return resultado
 
+def listar_turmas():
+    conn   = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM turmas')
+    resultado = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return resultado
+
 def obter_aluno(aluno_id):
     conn   = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -87,6 +96,17 @@ def excluir_aluno(aluno_id):
     cursor.close()
     conn.close()
     return linhas_afetadas > 0
+
+def inserir_turma(nome, sigla):
+    conn = get_connection()
+    cursor = conn.cursor()
+    sql = '''INSERT INTO turmas (nome, sigla) VALUES (%s, %s)'''
+    cursor.execute(sql, (nome, sigla))
+    conn.commit()
+    novo_id = cursor.lastrowid
+    cursor.close()
+    conn.close()
+    return novo_id
 
 def marcar_impresso(aluno_id, impresso):
     conn   = get_connection()

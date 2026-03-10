@@ -11,6 +11,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
 
+    // Carregar Turmas do Banco de Dados
+    async function carregarTurmas() {
+        try {
+            const res = await fetch('/api/turmas');
+            if (res.ok) {
+                const turmas = await res.json();
+                if (turmaSelect) {
+                    const optionAll = turmaSelect.querySelector('option[value="ALL"]');
+                    turmas.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.sigla || t.id || t.nome;
+                        opt.textContent = t.nome || t.sigla || t.id;
+                        if (optionAll) {
+                            turmaSelect.insertBefore(opt, optionAll);
+                        } else {
+                            turmaSelect.appendChild(opt);
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('Erro ao carregar turmas', e);
+        }
+    }
+    carregarTurmas();
+
     // Constantes do Layout (A4 = 210 x 297 mm)
     // Layout dobrável: 170mm (L) x 55mm (A)
     const CARD_WIDTH = 170;
@@ -346,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(50, 50, 50);
-        doc.text("Assinatura do(a) Diretor(a)", VERSO_X + 37.5, versoY, { align: 'center' });
+        doc.text("Diretor(a)", VERSO_X + 37.5, versoY, { align: 'center' });
 
         // Rodapé (nas duas metades)
         doc.setFontSize(7);

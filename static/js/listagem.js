@@ -5,6 +5,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const filtroTurma = document.getElementById('filtro-turma');
     const filtroTurno = document.getElementById('filtro-turno');
 
+    // Carregar Turmas do Banco de Dados
+    async function carregarTurmas() {
+        try {
+            const res = await fetch('/api/turmas');
+            if (res.ok) {
+                const turmas = await res.json();
+
+                turmas.forEach(t => {
+                    const value = t.sigla || t.id || t.nome;
+                    const text = t.nome || t.sigla || t.id;
+
+                    if (filtroTurma) {
+                        const opt = document.createElement('option');
+                        opt.value = value;
+                        opt.textContent = text;
+                        filtroTurma.appendChild(opt);
+                    }
+
+                    const editTurma = document.getElementById('edit-turma');
+                    if (editTurma) {
+                        const opt = document.createElement('option');
+                        opt.value = value;
+                        opt.textContent = text;
+                        editTurma.appendChild(opt);
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Erro ao carregar turmas', e);
+        }
+    }
+    carregarTurmas();
+
     // Carregar alunos ao abrir a página
     carregarAlunos();
 
