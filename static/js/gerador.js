@@ -320,14 +320,14 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(aluno.turno || '', TEXT_X + 20, currentY);
         currentY += 5;
 
-        // Código INEP
+        // Matrícula
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text("Código INEP", TEXT_X, currentY);
+        doc.text("Matrícula", TEXT_X, currentY);
         currentY += 3;
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(0, 0, 0);
-        doc.text(aluno.codigo_inep || '', TEXT_X, currentY);
+        doc.text(aluno.matricula || '', TEXT_X, currentY);
 
         /* ---------------------------------------------------------
          * VERSO DA CARTEIRINHA (Direita: Área 85 a 170 relative X)

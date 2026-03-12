@@ -53,33 +53,33 @@ def obter_aluno(aluno_id):
     conn.close()
     return resultado
 
-def inserir_aluno(nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, foto, ano_letivo):
+def inserir_aluno(nome, matricula, nome_mae, data_nascimento, curso, turma, turno, foto, ano_letivo):
     conn   = get_connection()
     cursor = conn.cursor()
     sql = '''INSERT INTO alunos
-             (nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, foto, ano_letivo)
+             (nome, matricula, nome_mae, data_nascimento, curso, turma, turno, foto, ano_letivo)
              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'''
-    cursor.execute(sql, (nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, foto, ano_letivo))
+    cursor.execute(sql, (nome, matricula, nome_mae, data_nascimento, curso, turma, turno, foto, ano_letivo))
     conn.commit()
     novo_id = cursor.lastrowid
     cursor.close()
     conn.close()
     return novo_id
 
-def atualizar_aluno(aluno_id, nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, foto=None):
+def atualizar_aluno(aluno_id, nome, matricula, nome_mae, data_nascimento, curso, turma, turno, foto=None):
     conn   = get_connection()
     cursor = conn.cursor()
     
     if foto:
         sql = '''UPDATE alunos 
-                 SET nome=%s, codigo_inep=%s, nome_mae=%s, data_nascimento=%s, curso=%s,turma=%s, turno=%s, foto=%s 
+                 SET nome=%s, matricula=%s, nome_mae=%s, data_nascimento=%s, curso=%s,turma=%s, turno=%s, foto=%s 
                  WHERE id=%s'''
-        cursor.execute(sql, (nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, foto, aluno_id))
+        cursor.execute(sql, (nome, matricula, nome_mae, data_nascimento, curso, turma, turno, foto, aluno_id))
     else:
         sql = '''UPDATE alunos 
-                 SET nome=%s, codigo_inep=%s, nome_mae=%s, data_nascimento=%s, curso=%s,turma=%s, turno=%s 
+                 SET nome=%s, matricula=%s, nome_mae=%s, data_nascimento=%s, curso=%s,turma=%s, turno=%s 
                  WHERE id=%s'''
-        cursor.execute(sql, (nome, codigo_inep, nome_mae, data_nascimento, curso, turma, turno, aluno_id))
+        cursor.execute(sql, (nome, matricula, nome_mae, data_nascimento, curso, turma, turno, aluno_id))
         
     conn.commit()
     linhas_afetadas = cursor.rowcount

@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <img src="/uploads/${aluno.foto}" alt="Foto" class="table-foto" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(aluno.nome)}&background=random'">
                 </td>
-                <td><strong>${aluno.codigo_inep}</strong></td>
+                <td><strong>${aluno.matricula}</strong></td>
                 <td>${aluno.nome}</td>
                 <td>${aluno.turma}</td>
                 <td>${aluno.turno}</td>
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Preenche os campos do formulário
                 document.getElementById('edit-id').value = aluno.id;
                 document.getElementById('edit-nome').value = aluno.nome;
-                document.getElementById('edit-codigo_inep').value = aluno.codigo_inep;
+                document.getElementById('edit-matricula').value = aluno.matricula;
                 document.getElementById('edit-nome_mae').value = aluno.nome_mae || '';
 
                 // Formata a data (YYYY-MM-DD) se ela existir do banco vindo como DateString

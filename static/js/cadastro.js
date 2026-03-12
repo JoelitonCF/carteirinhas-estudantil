@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Drag events
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
+
     });
 
     function preventDefaults(e) {
