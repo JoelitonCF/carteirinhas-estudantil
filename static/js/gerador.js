@@ -38,10 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarTurmas();
 
     // Constantes do Layout (A4 = 210 x 297 mm)
-    // Layout dobrável: 170mm (L) x 55mm (A)
-    const CARD_WIDTH = 170;
-    const CARD_HEIGHT = 55;
-    const MARGIN_X = 20; // Margem da esquerda (Centralizando: 210 - 170 = 40 / 2 = 20)
+    // Layout dobrável: 180mm (L) x 60mm (A)
+    const CARD_WIDTH = 180;
+    const CARD_HEIGHT = 60;
+    const MARGIN_X = 15; // Margem da esquerda (Centralizando: 210 - 180 = 30 / 2 = 15)
     const MARGIN_Y = 15; // Margem do topo
     const GAP_X = 0;    // Espaço horizontal nulo pois terá só 1 coluna
     const GAP_Y = 10;    // Espaço vertical entre as linhas
@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Pré-carregar o modelo de fundo (Photoshop)
             let templateBase64 = null;
+            let icones = { iconUser: null, iconCurso: null, iconData: null };
             try {
                 // Tenta carregar o template na pasta static.
                 // O usuário deve salvar a imagem lá com o nome modelo_carteirinha.png
@@ -108,8 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Modelo de fundo não encontrado em /static/img/modelo_carteirinha.png. Usando layout padrão.');
             }
 
+            try { icones.iconUser = await loadImageAsBase64('/static/img/icone-user.png'); } catch (e) { }
+            try { icones.iconCurso = await loadImageAsBase64('/static/img/icone-curso.png'); } catch (e) { }
+            try { icones.iconData = await loadImageAsBase64('/static/img/icone-data.png'); } catch (e) { }
+
             // 3. Desenhar no PDF
-            gerarDocumentoPDF(alunosComImagens, templateBase64);
+            gerarDocumentoPDF(alunosComImagens, templateBase64, icones);
 
         } catch (e) {
             console.error(e);
@@ -147,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function gerarDocumentoPDF(alunos, templateBase64) {
+    function gerarDocumentoPDF(alunos, templateBase64, icones = {}) {
         // Inicializa PDF = Retrato (p), milímetros (mm), A4 (a4)
         const doc = new jsPDF('p', 'mm', 'a4');
 
@@ -156,7 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let contadorItemSheet = 0; // Quantos itens já foram desenhados na página atual (0 até 4)
 
         alunos.forEach((aluno, index) => {
-            // Cabem 4 carteirinhas por página (4 * 65 = 260mm + margem = 275mm)
+            // Atenção: A4 tem 297mm de altura. 5 carteirinhas de 60mm dão 300mm (vai cortar!)
+            // O ideal para 60mm de altura são 4 por página: 4 * (60 + 10) + 15 = 295mm.
             if (contadorItemSheet > 0 && contadorItemSheet % 4 === 0) {
                 doc.addPage();
                 x = MARGIN_X;
@@ -171,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             x = MARGIN_X + (coluna * (CARD_WIDTH + GAP_X));
             y = MARGIN_Y + (linha * (CARD_HEIGHT + GAP_Y));
 
-            desenharCarteirinha(doc, x, y, aluno, templateBase64);
+            desenharCarteirinha(doc, x, y, aluno, templateBase64, icones);
 
             contadorItemSheet++;
         });
@@ -225,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // A função principal onde acontece o DESENHO real da carteirinha
-    function desenharCarteirinha(doc, startX, startY, aluno, templateBase64) {
+    function desenharCarteirinha(doc, startX, startY, aluno, templateBase64, icones = {}) {
 
         if (templateBase64) {
             // Desenha a imagem de fundo ocupando 170x55
@@ -240,29 +246,29 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.setFillColor(255, 255, 255);
             doc.roundedRect(startX, startY, CARD_WIDTH, CARD_HEIGHT, 3, 3, 'FD');
 
-            // Linha divisória da dobra (meio = 85mm)
+            // Linha divisória da dobra (meio = 90mm)
             doc.setDrawColor(200, 200, 200);
             doc.setLineDashPattern([1, 1], 0); // linha pontilhada
-            doc.line(startX + 85, startY, startX + 85, startY + CARD_HEIGHT);
+            doc.line(startX + 90, startY, startX + 90, startY + CARD_HEIGHT);
             doc.setLineDashPattern([], 0); // reseta padrao solid
 
             // Cabeçalho Colorido (Retângulo Azul no Topo)
             doc.setFillColor(79, 70, 229);
-            doc.rect(startX, startY, 85, 12, 'F'); // Frente
-            doc.rect(startX + 85, startY, 85, 12, 'F'); // Verso
+            doc.rect(startX, startY, 90, 12, 'F'); // Frente
+            doc.rect(startX + 90, startY, 90, 12, 'F'); // Verso
 
             // Texto Cabeçalho Frente
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
-            doc.text("IDENTIFICAÇÃO ESTUDANTIL", startX + (85 / 2), startY + 8, { align: 'center' });
+            doc.text("IDENTIFICAÇÃO ESTUDANTIL", startX + (90 / 2), startY + 8, { align: 'center' });
 
             // Texto Cabeçalho Verso
-            doc.text("INFORMAÇÕES ADICIONAIS", startX + 85 + (85 / 2), startY + 8, { align: 'center' });
+            doc.text("INFORMAÇÕES ADICIONAIS", startX + 90 + (90 / 2), startY + 8, { align: 'center' });
         }
 
         /* ---------------------------------------------------------
-         * FRENTE DA CARTEIRINHA (Esquerda: Área 0 a 85 relative X)
+         * FRENTE DA CARTEIRINHA (Esquerda: Área 0 a 90 relative X)
          * --------------------------------------------------------- */
         const FRENTE_X = startX;
 
@@ -284,29 +290,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Textos da Frente
-        const TEXT_X = FOTO_X + FOTO_WIDTH + 5;
-        let currentY = FOTO_Y + 4;
+        const TEXT_X = FOTO_X + FOTO_WIDTH + 3;
+        let currentY = FOTO_Y + 2;
 
         // Nome
-        doc.setTextColor(30, 30, 30);
-        doc.setFontSize(9);
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        if (icones.iconUser) {
+            doc.addImage(icones.iconUser, 'PNG', TEXT_X, currentY - 2.5, 3, 3);
+            doc.text("Nome:", TEXT_X + 4, currentY);
+        } else {
+            doc.text("Nome:", TEXT_X, currentY);
+        }
+        currentY += 4;
+
+        doc.setTextColor(255, 255, 255); // Texto branco
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
-        const splitNome = doc.splitTextToSize((aluno.nome || '').toUpperCase(), 85 - FOTO_WIDTH - 12);
+        const splitNome = doc.splitTextToSize((aluno.nome || '').toUpperCase(), 90 - FOTO_WIDTH - 12);
+
+        // Define o Rect com uma margem extra de 1.5mm em cima/baixo e esquerda/direita
+        // e um padding de +2mm na largura e +3mm na altura
+        const alturaRectNome = (splitNome.length * 4) + 1;
+        const offsetIcone = icones.iconUser ? 4 : 0;
+
+        doc.setFillColor(46, 111, 64); // Fundo Azul (O mesmo do Cabeçalho)
+        doc.roundedRect(TEXT_X - 1.0, currentY - 3.5, (90 - FOTO_WIDTH - 12) + 2, alturaRectNome, 1.0, 1.0, 'F');
+
         doc.text(splitNome, TEXT_X, currentY);
 
-        currentY += (splitNome.length * 4) + 1;
+        currentY += alturaRectNome;
 
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
 
         // Curso
-        doc.text("Curso", TEXT_X, currentY);
+        if (icones.iconCurso) {
+            doc.addImage(icones.iconCurso, 'PNG', TEXT_X, currentY - 2.5, 3, 3);
+            doc.text("Curso", TEXT_X + 4, currentY);
+        } else {
+            doc.text("Curso", TEXT_X, currentY);
+        }
         currentY += 3;
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(0, 0, 0);
         doc.text((aluno.curso || 'ENSINO MÉDIO').toUpperCase(), TEXT_X, currentY);
-        currentY += 5;
+        currentY += 4;
 
         // Turma e Turno
         doc.setFont('helvetica', 'normal');
@@ -318,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setTextColor(0, 0, 0);
         doc.text(aluno.turma || '', TEXT_X, currentY);
         doc.text(aluno.turno || '', TEXT_X + 20, currentY);
-        currentY += 5;
+        currentY += 4;
 
         // Matrícula
         doc.setFont('helvetica', 'normal');
@@ -330,9 +361,9 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(aluno.matricula || '', TEXT_X, currentY);
 
         /* ---------------------------------------------------------
-         * VERSO DA CARTEIRINHA (Direita: Área 85 a 170 relative X)
+         * VERSO DA CARTEIRINHA (Direita: Área 90 a 180 relative X)
          * --------------------------------------------------------- */
-        const VERSO_X = startX + 85 + 5;
+        const VERSO_X = startX + 90 + 5;
         let versoY = startY + 18;
 
         // Mãe
@@ -353,7 +384,12 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text("Data de Nascimento", VERSO_X, versoY);
+        if (icones.iconData) {
+            doc.addImage(icones.iconData, 'PNG', VERSO_X, versoY - 2.5, 3, 3);
+            doc.text("Data de Nascimento", VERSO_X + 4, versoY);
+        } else {
+            doc.text("Data de Nascimento", VERSO_X, versoY);
+        }
         versoY += 4;
 
         doc.setFont('helvetica', 'bold');
@@ -379,9 +415,9 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(255, 255, 255);
         // Rodapé Frente
-        doc.text(`Válida até Dez. de ${aluno.ano_letivo || '2026'}`, FRENTE_X + (85 / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
+        doc.text(`Válida até Dez. de ${aluno.ano_letivo || '2026'}`, FRENTE_X + (90 / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
         // Rodapé Verso
-        doc.text(`Uso Pessoal e Intransferível`, VERSO_X - 5 + (85 / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
+        doc.text(`Uso Pessoal e Intransferível`, VERSO_X - 5 + (90 / 2), startY + CARD_HEIGHT - 3, { align: 'center' });
     }
 
     // Marca os lote dos alunos como impressos após a geração do PDF

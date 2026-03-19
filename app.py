@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 import database
 
 app = Flask(__name__)
-# A secret key é necessária para sessões (mesmo que não usemos explicitamente)
+# A secret key é necessária para sessões
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
 
 # Configurações de Upload
@@ -155,7 +155,8 @@ def atualizar_aluno(aluno_id):
         return jsonify({"erro": "Todos os campos de texto são obrigatórios."}), 400
 
     nome_arquivo = None
-    matricula = aluno_existente['matricula'] # Pega a matrícula já existente no banco
+    # Pega a matrícula já existente no banco
+    matricula = aluno_existente['matricula']
 
     # Tratamento de envio de nova foto
     if 'foto' in request.files:
